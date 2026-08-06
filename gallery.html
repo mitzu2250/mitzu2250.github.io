@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Gallery</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#fafafa;
+}
+
+.gallery{
+    width:min(900px,95%);
+    margin:40px auto;
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.gallery img{
+    width:100%;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.25s;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+
+.gallery img:hover{
+    transform:scale(1.01);
+}
+
+.lightbox{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.92);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+}
+
+.lightbox.active{
+    display:flex;
+}
+
+.lightbox img{
+    max-width:92vw;
+    max-height:92vh;
+    border-radius:8px;
+    user-select:none;
+}
+
+.close{
+    position:absolute;
+    top:20px;
+    right:30px;
+    color:white;
+    font-size:45px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    color:white;
+    font-size:65px;
+    cursor:pointer;
+    user-select:none;
+    padding:20px;
+}
+
+.left{
+    left:15px;
+}
+
+.right{
+    right:15px;
+}
+
+.arrow:hover,
+.close:hover{
+    opacity:.7;
+}
+
+.counter{
+    position:absolute;
+    bottom:20px;
+    color:white;
+    font-size:18px;
+}
+
+@media(max-width:700px){
+
+.arrow{
+    font-size:45px;
+    padding:15px;
+}
+
+.close{
+    font-size:36px;
+}
+
+}
+</style>
+
+</head>
+<body>
+
+<div class="gallery">
+
+<img src="https://lh3.googleusercontent.com/sitesv/AG8ngQUQ7mm9mPOoklJy5UCKEkMTyx9W4S_mVpZCmBU18RPeDkp0Au1fjwq3DvvQy9DbDnVwOGPvyoioP2gZGo-7L2exknjWWnFS0Q7erxwITDUkn6IgQnRkgWbFhJ-IWRZPzZPTpIEGA5mGXnXFvs8p6f7jmaywS82FWdC5emLTLeDKIUHY93BMC1iRtZUj3v-KLhPSDR9tJW4uXNaaUxGsDy56mf45vOdxhRof5NHRIeA=w1280">
+
+<img src="https://lh3.googleusercontent.com/sitesv/AG8ngQUuE_SsTV5cW-AUvMkZOn9QDRunWf1uJibyMJ7CG49uYh-fke8Y8Hm5IysuxqMEOaszYDkMA6Qs0F42Rzwa3kG0_9XHXdwMcclV3-Cs2PFjoa555vL-nkVuuEyZ_yhzDL9A4Mcp7Z9rpcKjEn7w-c8V8qzCpRloazp0XATUiQZp0Xuzx0qF3YBSv3Hec7rZUMt7aGl4XRPKET4sT1dsnclSeWOo5tjC6uvwlPCC=w1280">
+
+<img src="https://lh3.googleusercontent.com/sitesv/AG8ngQW-s65X7PQw9Rnsjyw2Lbhwv2rLEzt7EbaSBVNSPD_6kcYiE3Klopd89htAiGhqJ9DETgsu-SQODlazEZoK3R6jYck_6d36RCYo_3TReYOnmLTENL_c60CW0bjdWFZbwBD4ywxAYCdvs85qyXqareK6g2wObtyhROKNvGeGMJhAMu0fLN-gBmwynu6eGSOCjtspI818fseHFC6p2vc47Mf-XovxPyLWueHqckGj=w1280">
+
+</div>
+
+<div class="lightbox">
+
+<div class="close">&times;</div>
+
+<div class="arrow left">&#10094;</div>
+
+<img id="lightboxImage">
+
+<div class="arrow right">&#10095;</div>
+
+<div class="counter"></div>
+
+</div>
+
+<script>
+
+const images=[...document.querySelectorAll(".gallery img")];
+
+const lightbox=document.querySelector(".lightbox");
+const lightboxImage=document.getElementById("lightboxImage");
+const closeBtn=document.querySelector(".close");
+const left=document.querySelector(".left");
+const right=document.querySelector(".right");
+const counter=document.querySelector(".counter");
+
+let current=0;
+
+function show(index){
+
+current=index;
+
+lightboxImage.src=images[current].src;
+
+counter.innerHTML=(current+1)+" / "+images.length;
+
+lightbox.classList.add("active");
+
+}
+
+images.forEach((img,index)=>{
+
+img.addEventListener("click",()=>show(index));
+
+});
+
+function next(){
+
+current++;
+
+if(current>=images.length)
+current=0;
+
+show(current);
+
+}
+
+function previous(){
+
+current--;
+
+if(current<0)
+current=images.length-1;
+
+show(current);
+
+}
+
+right.onclick=next;
+
+left.onclick=previous;
+
+closeBtn.onclick=()=>lightbox.classList.remove("active");
+
+lightbox.onclick=e=>{
+
+if(e.target===lightbox)
+lightbox.classList.remove("active");
+
+};
+
+document.addEventListener("keydown",e=>{
+
+if(!lightbox.classList.contains("active"))
+return;
+
+if(e.key==="ArrowRight")
+next();
+
+if(e.key==="ArrowLeft")
+previous();
+
+if(e.key==="Escape")
+lightbox.classList.remove("active");
+
+});
+
+let touchStartX=0;
+
+lightbox.addEventListener("touchstart",e=>{
+
+touchStartX=e.changedTouches[0].clientX;
+
+});
+
+lightbox.addEventListener("touchend",e=>{
+
+const dx=e.changedTouches[0].clientX-touchStartX;
+
+if(dx>70)
+previous();
+
+if(dx<-70)
+next();
+
+});
+
+</script>
+
+</body>
+</html>
